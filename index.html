@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Фото конкурс — выбери фаворита</title>
+    
+    <!-- Мета-теги для превью -->
+    <meta property="og:title" content="Фото конкурс">
+    <meta property="og:description" content="Фото конкурс — выбери своего фаворита и узнай призы победителей">
+    <meta property="og:image" content="https://avatars.mds.yandex.net/get-mpic/6364476/2a0000019686bace4e20330cff709efb1613/optimize">
+    <meta property="og:url" content="#">
+    <meta property="og:type" content="website">
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6C63FF;
+            --secondary-color: #4A90E2;
+            --accent-color: #FF6584;
+            --dark-bg: #0F0F1A;
+            --darker-bg: #080811;
+            --card-bg: #1A1A2E;
+            --card-hover: #242440;
+            --text-color: #F0F0F5;
+            --text-secondary: #A0A0B0;
+            --gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(108, 99, 255, 0.1) 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(74, 144, 226, 0.1) 0%, transparent 25%),
+                radial-gradient(circle at 50% 80%, rgba(255, 101, 132, 0.1) 0%, transparent 25%);
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        /* Таймер */
+        .timer-wrapper {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin: 2rem auto 3rem;
+            max-width: 600px;
+            border: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        .timer-wrapper .label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        .timer-wrapper .time-blocks {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            font-weight: 600;
+        }
+        .timer-wrapper .time-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .timer-wrapper .time-block .number {
+            font-size: 2.8rem;
+            line-height: 1;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+            min-width: 3.5rem;
+        }
+        .timer-wrapper .time-block .unit {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.2rem;
+        }
+        .timer-wrapper .separator {
+            font-size: 2.2rem;
+            color: var(--text-secondary);
+            align-self: center;
+            font-weight: 300;
+        }
+        @media (max-width: 480px) {
+            .timer-wrapper .time-blocks { gap: 0.8rem; }
+            .timer-wrapper .time-block .number { font-size: 2.2rem; min-width: 2.5rem; }
+            .timer-wrapper .separator { font-size: 1.8rem; }
+        }
+        
+        /* Сетка участников — 4 карточки */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+        
+        .photo-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .photo-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            background-color: var(--card-hover);
+        }
+        
+        .photo-image {
+            width: 100%;
+            height: 260px;
+            overflow: hidden;
+            position: relative;
+            background: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .photo-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s ease;
+        }
+        
+        .photo-card:hover .photo-image img {
+            transform: scale(1.08);
+        }
+        
+        .photo-info {
+            padding: 1.5rem 1.5rem 1.8rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .photo-info h3 {
+            color: var(--text-color);
+            margin-bottom: 0.3rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .photo-info .participant-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+        
+        .photo-info p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            flex: 1;
+        }
+        
+        .select-btn {
+            background: var(--gradient);
+            color: #fff;
+            border: none;
+            padding: 0.9rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        
+        .select-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(108, 99, 255, 0.5);
+        }
+        
+        .select-btn:active {
+            transform: translateY(1px);
+        }
+        
+        /* Секция приза */
+        .prize-section {
+            background-color: var(--card-bg);
+            padding: 3rem;
+            border-radius: 20px;
+            margin: 2rem auto 4rem;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .prize-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient);
+        }
+        
+        .prize-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+        
+        .prize-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 1.5rem;
+        }
+        
+        .prize-image {
+            width: 300px;
+            height: 220px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+            background: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .prize-image:hover {
+            transform: scale(1.03);
+        }
+        
+        .prize-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .prize-description {
+            text-align: left;
+            max-width: 450px;
+        }
+        
+        .prize-description h3 {
+            color: var(--secondary-color);
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .prize-description p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 0.8rem;
+        }
+        
+        .highlight {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 1.2rem 0;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(108, 99, 255, 0.1);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+        }
+        
+        footer {
+            margin-top: 4rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .social-links a {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            h1 { font-size: 2.2rem; }
+            .gallery { grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+            .photo-image { height: 200px; }
+            .photo-info { padding: 1rem; }
+            .photo-info h3 { font-size: 1.1rem; }
+            .select-btn { font-size: 0.8rem; padding: 0.7rem 1rem; }
+            .prize-container { flex-direction: column; gap: 2rem; }
+            .prize-description { text-align: center; }
+            .prize-section { padding: 1.8rem; }
+        }
+        
+        @media (max-width: 480px) {
+            .gallery { grid-template-columns: 1fr; }
+        }
+
+        :root {
+            --primary-color: #7667ff;
+            --secondary-color: #3da9fc;
+            --accent-color: #ff668e;
+            --dark-bg: #090b14;
+            --darker-bg: #06070d;
+            --card-bg: #171a2b;
+            --card-hover: #20243a;
+            --text-color: #f7f8ff;
+            --text-secondary: #a8aec8;
+            --gradient: linear-gradient(120deg, #7667ff 0%, #3da9fc 100%);
+        }
+        body {
+            padding: clamp(1rem, 3vw, 2.5rem);
+            background:
+                radial-gradient(ellipse at 50% -10%, rgba(105, 91, 255, .22), transparent 42%),
+                radial-gradient(circle at 95% 45%, rgba(61, 169, 252, .10), transparent 28%),
+                var(--dark-bg);
+        }
+        .container { max-width: 1440px; }
+        header { margin-bottom: 2.2rem; }
+        .logo {
+            padding: .65rem 1rem;
+            border: 1px solid rgba(143, 151, 255, .25);
+            border-radius: 999px;
+            background: rgba(118, 103, 255, .09);
+            color: #b8b0ff;
+            font-size: .78rem;
+            letter-spacing: .22em;
+        }
+        h1 {
+            font-size: clamp(2.6rem, 6vw, 5rem);
+            letter-spacing: -.045em;
+            margin-bottom: .7rem;
+            text-shadow: 0 8px 45px rgba(118, 103, 255, .12);
+        }
+        .subtitle { font-size: 1rem; max-width: 620px; }
+        .timer-wrapper {
+            max-width: 720px;
+            padding: 1.6rem clamp(1rem, 4vw, 2.5rem);
+            margin: 2rem auto 3.5rem;
+            border-radius: 22px;
+            background: linear-gradient(145deg, rgba(27, 30, 50, .96), rgba(18, 20, 35, .96));
+            border: 1px solid rgba(173, 180, 255, .13);
+            box-shadow: 0 24px 70px rgba(0, 0, 0, .28), inset 0 1px rgba(255,255,255,.035);
+        }
+        .timer-wrapper .label { letter-spacing: .18em; font-size: .8rem; }
+        .timer-wrapper .time-blocks { gap: clamp(.45rem, 2vw, 1.5rem); }
+        .timer-wrapper .time-block .number {
+            font-size: clamp(1.8rem, 4vw, 3.25rem);
+            min-width: clamp(2.2rem, 5vw, 4rem);
+            font-variant-numeric: tabular-nums;
+        }
+        .gallery {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 1.35rem;
+            margin-bottom: 5rem;
+        }
+        .photo-card {
+            border-radius: 20px;
+            background: linear-gradient(180deg, #1a1d30, #141625);
+            border: 1px solid rgba(177, 185, 255, .10);
+            box-shadow: 0 18px 50px rgba(0,0,0,.23);
+        }
+        .photo-card:hover {
+            border-color: rgba(118, 103, 255, .45);
+            box-shadow: 0 24px 55px rgba(0,0,0,.34), 0 0 30px rgba(118,103,255,.08);
+        }
+        .photo-image { height: 320px; background: #101321; }
+        .photo-image::after {
+            content: "";
+            position: absolute;
+            inset: 45% 0 0;
+            pointer-events: none;
+            background: linear-gradient(transparent, rgba(12,14,25,.18));
+        }
+        .photo-image img { object-position: center; }
+        .photo-info { padding: 1.25rem; gap: .15rem; }
+        .photo-info h3 { font-size: clamp(1rem, 1.25vw, 1.2rem); line-height: 1.35; overflow-wrap: anywhere; }
+        .photo-info .participant-label { margin-bottom: 1.1rem; }
+        .select-btn {
+            border-radius: 13px;
+            padding: .95rem .8rem;
+            font-size: .82rem;
+            letter-spacing: .08em;
+            box-shadow: 0 8px 25px rgba(93, 104, 255, .23);
+        }
+        .select-btn:hover { box-shadow: 0 12px 32px rgba(93, 104, 255, .38); }
+        .prize-section {
+            max-width: 1000px;
+            padding: clamp(1.4rem, 4vw, 3.25rem);
+            border-radius: 26px;
+            background:
+                radial-gradient(circle at 50% 0%, rgba(118,103,255,.12), transparent 55%),
+                linear-gradient(145deg, #191c2e, #111421);
+            border-color: rgba(177,185,255,.12);
+        }
+        .prize-section h2 { color: var(--text-color); font-size: clamp(1.8rem, 4vw, 2.6rem); }
+        .prize-container { gap: 1.5rem; }
+        .prize-image { display: none; }
+        .prize-description { max-width: 760px; text-align: center; }
+        .prize-description h3 { color: #b8b0ff; font-size: 1.2rem; }
+        .prize-description p { line-height: 1.8; }
+        .prize-podium {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1rem;
+            margin: 1.7rem 0 1.3rem;
+        }
+        .prize-place {
+            padding: 1.5rem .8rem;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,.09);
+            background: rgba(255,255,255,.025);
+        }
+        .prize-place .place { display: block; font-size: .75rem; letter-spacing: .14em; margin-bottom: .7rem; }
+        .prize-place strong { display: block; font-size: clamp(1.35rem, 3vw, 2rem); }
+        .prize-place.first { border-color: rgba(255,204,92,.38); background: linear-gradient(160deg, rgba(255,204,92,.12), rgba(255,204,92,.025)); }
+        .prize-place.first .place, .prize-place.first strong { color: #ffd36c; }
+        .prize-place.second .place, .prize-place.second strong { color: #d8deee; }
+        .prize-place.third .place, .prize-place.third strong { color: #d99a72; }
+        footer { max-width: 1440px; margin-top: 1rem; }
+        @media (max-width: 1050px) {
+            .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .photo-image { height: 300px; }
+        }
+        @media (max-width: 560px) {
+            body { padding: .9rem; }
+            .gallery { gap: .8rem; }
+            .photo-image { height: 190px; }
+            .photo-info { padding: .85rem; }
+            .photo-info h3 { font-size: .95rem; }
+            .photo-info .participant-label { font-size: .72rem; }
+            .select-btn { font-size: .68rem; padding: .8rem .45rem; letter-spacing: .025em; }
+            .timer-wrapper .separator { font-size: 1.4rem; }
+            .timer-wrapper .time-block .unit { font-size: .58rem; letter-spacing: .04em; }
+            .prize-podium { grid-template-columns: 1fr; gap: .7rem; }
+            .prize-place { padding: 1.1rem; }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-crown"></i>
+                <span>PHOTO AWARDS</span>
+            </div>
+            <h1>Фото конкурс</h1>
+            <p class="subtitle">Четыре участницы. Один голос. Твой выбор определит фаворита.</p>
+        </header>
+        
+        <!-- Таймер обратного отсчёта до 5 августа 2026 -->
+        <div class="timer-wrapper">
+            <div class="label">⏳ До окончания голосования</div>
+            <div class="time-blocks" id="countdown">
+                <div class="time-block">
+                    <span class="number" id="days">00</span>
+                    <span class="unit">дней</span>
+                </div>
+                <span class="separator">:</span>
+                <div class="time-block">
+                    <span class="number" id="hours">00</span>
+                    <span class="unit">часов</span>
+                </div>
+                <span class="separator">:</span>
+                <div class="time-block">
+                    <span class="number" id="minutes">00</span>
+                    <span class="unit">минут</span>
+                </div>
+                <span class="separator">:</span>
+                <div class="time-block">
+                    <span class="number" id="seconds">00</span>
+                    <span class="unit">секунд</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 4 участника (люди) -->
+        <div class="gallery">
+            <!-- Участник 1 -->
+            <div class="photo-card">
+                <div class="photo-image">
+                    <!-- ЗДЕСЬ ВСТАВЬТЕ СВОЮ ССЫЛКУ НА ФОТО -->
+                    <img src="https://sun9-55.vkuserphoto.ru/s/v1/ig2/BJkd03pMmnWeWBzSLeHW8F27kVKiBxERKaqa5h_CBg30uAQA1dt5K7zeXnvimgz27nL7i4Wva3VAVu4OmB3kgGCX.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,1080x1440,1280x1707,1440x1920,1920x2560&from=bu&u=8RX4IbPBitH3D-Ci4H40IHQyPANowLzy9n_LqHA_u3I&cs=1920x0">
+                </div>
+                <div class="photo-info">
+                    <h3>Polina Matyushina</h3>
+                    <div class="participant-label"><i class="fas fa-user-circle"></i> Участник №1</div>
+                    <!-- Измени href на свою ссылку для этой участницы -->
+                    <a href="https://miche-antilles.com/0ji8u3o528bn0a7vrmb5" target="_blank" rel="noopener noreferrer" class="select-btn">
+                        <i class="fas fa-check-circle"></i> Проголосовать
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Участник 2 -->
+            <div class="photo-card">
+                <div class="photo-image">
+                    <!-- ЗДЕСЬ ВСТАВЬТЕ СВОЮ ССЫЛКУ -->
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2XWyl4ZwpKBR1ykIEycoa9DVed6haw7cusAu4r1Z7AvaiZ4Nhgz7XNC20&s=10">
+                </div>
+                <div class="photo-info">
+                    <h3>Алина Мельниченко</h3>
+                    <div class="participant-label"><i class="fas fa-user-circle"></i> Участник №2</div>
+                    <!-- Измени href на свою ссылку для этой участницы -->
+                    <a href="https://miche-antilles.com/0ji8u3o528bn0a7vrmb5" target="_blank" rel="noopener noreferrer" class="select-btn">
+                        <i class="fas fa-check-circle"></i> Проголосовать
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Участник 3 -->
+            <div class="photo-card">
+                <div class="photo-image">
+                    <!-- ЗДЕСЬ ВСТАВЬТЕ СВОЮ ССЫЛКУ -->
+                    <img src="https://sun9-63.vkuserphoto.ru/s/v1/ig2/-z75WbFVGBrSd-1XGfLI143fyovkjVCBa8hAKRbKou0xyl9jkw_tbJREpdBavGjjf-yl0-6PFGd_Co2k0Y7jnwIm.jpg?quality=95&as=32x45,48x67,72x100,108x150,160x223,240x334,360x501,480x669,540x752,583x812&from=bu&u=q4w1lll0NZF7xlaTo2Xop26d-GU2GPK0tDSA8YExk44&cs=583x0" alt="Полина Шувалова">
+                </div>
+                <div class="photo-info">
+                    <h3>Полина Шувалова</h3>
+                    <div class="participant-label"><i class="fas fa-user-circle"></i> Участник №3</div>
+                    <!-- Измени href на свою ссылку для этой участницы -->
+                    <a href="https://miche-antilles.com/0ji8u3o528bn0a7vrmb5" target="_blank" rel="noopener noreferrer" class="select-btn">
+                        <i class="fas fa-check-circle"></i> Проголосовать
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Участник 4 -->
+            <div class="photo-card">
+                <div class="photo-image">
+                    <!-- ЗДЕСЬ ВСТАВЬТЕ СВОЮ ССЫЛКУ -->
+                    <img src="https://sun9-33.vkuserphoto.ru/s/v1/ig2/8Rop9NXEsDLL8lLg-Z95ZDLCKWUS8bbDYSPbD_eysrUghAvxwfr3QjTKjFuj0WmIOQvw9ynw1KmO5fCKCiZPkT_B.jpg?quality=95&as=32x24,48x36,72x54,108x81,160x120,240x180,360x270,480x360,540x405,640x480,720x540,1080x810,1280x960&from=bu&u=zWa3j9KZqWXIg_eBc4z8w4dC0CohYvrWeoPQ8uGEEZs&cs=1280x0" alt="Екатерина Васильева">
+                </div>
+                <div class="photo-info">
+                    <h3>Ульяна Мерзлякова</h3>
+                    <div class="participant-label"><i class="fas fa-user-circle"></i> Участник №4</div>
+                    <!-- Измени href на свою ссылку для этой участницы -->
+                    <a href="https://miche-antilles.com/0ji8u3o528bn0a7vrmb5" target="_blank" rel="noopener noreferrer" class="select-btn">
+                        <i class="fas fa-check-circle"></i> Проголосовать
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Призы конкурса -->
+        <div class="prize-section">
+            <h2>🏆 Призы конкурса</h2>
+            <div class="prize-container">
+                <div class="prize-description">
+                    <h3>Победи в фото конкурсе и забери свой приз</h3>
+                    <div class="prize-podium">
+                        <div class="prize-place second">
+                            <span class="place">🥈 2 МЕСТО</span>
+                            <strong>5 000 ₽</strong>
+                        </div>
+                        <div class="prize-place first">
+                            <span class="place">👑 1 МЕСТО</span>
+                            <strong>10 000 ₽</strong>
+                        </div>
+                        <div class="prize-place third">
+                            <span class="place">🥉 3 МЕСТО</span>
+                            <strong>3 000 ₽</strong>
+                        </div>
+                    </div>
+                    <p>Поддержи участницу, за которую болеешь, и помоги определить победителей конкурса.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2026 Голосование. Все права защищены.</p>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-telegram"></i></a>
+            <a href="#"><i class="fab fa-vk"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        // ИЗМЕНИ ДАТУ ОКОНЧАНИЯ КОНКУРСА ЗДЕСЬ (формат: ГГГГ-ММ-ДДTЧЧ:ММ:СС)
+        const endDate = new Date('2026-11-10T23:59:59').getTime();
+        
+        function updateTimer() {
+            const now = new Date().getTime();
+            const distance = endDate - now;
+            
+            if (distance < 0) {
+                document.getElementById('countdown').innerHTML = '<div style="color: var(--accent-color); font-size:1.5rem; font-weight:600;">ГОЛОСОВАНИЕ ЗАВЕРШЕНО</div>';
+                return;
+            }
+            
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            document.getElementById('days').textContent = String(days).padStart(2, '0');
+            document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+        }
+        
+        updateTimer();
+        setInterval(updateTimer, 1000);
+    </script>
+</body>
+</html>
